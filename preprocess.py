@@ -3,6 +3,6 @@ import pandas as pd
 
 dataset = load_dataset("HallowsYves/CPSC481-data")
 
-
-# Testing to see if data was loaded
-print(dataset["train"][:5])
+# Merge Data into two dataframes
+df_train = pd.concat([dataset["train"].to_pandas()])
+df_testing = pd.concat([dataset["test"].to_pandas()])
