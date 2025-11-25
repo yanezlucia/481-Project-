@@ -10,6 +10,8 @@ DDOS detector with AI integration
 ### Install Req's
 `pip install -r requirements.txt`
 
+## What was done
+* Separated X features from target feature y. 
 
 ## TODO:
-# Implement Weights
+* Implement Weights
