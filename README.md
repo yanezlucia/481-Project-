@@ -14,4 +14,5 @@ DDOS detector with AI integration
 * Separated X features from target feature y. 
 
 ## TODO:
+* Feature Scaling
 * Implement Weights
