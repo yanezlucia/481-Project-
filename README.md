@@ -12,7 +12,7 @@ DDOS detector with AI integration
 
 ## What was done
 * Separated X features from target feature y. 
+* Scaled Features
 
 ## TODO:
-* Feature Scaling
 * Implement Weights
