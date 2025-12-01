@@ -10,9 +10,22 @@ DDOS detector with AI integration
 ### Install Req's
 `pip install -r requirements.txt`
 
-### CURRENT TODO's:
-* ~~Merge all testing and training files into two big dataframes. (This allows the model to generalize and understand different attacks)~~
+## What was done
+* Separated X features from target feature y. 
+* Scaled Features
+* Created random_forest model. 
 
-* Drop Flow ID, Source IP, Destination IP, Source Port, Destination Port features. Not needed.
+## MODEL PERFORMANCE
+```
+F1 Score: 0.8131
 
-* Convert to duration-based features instead. (Idk how to do this :sob:)
+Classification Report:
+              precision    recall  f1-score   support
+
+      Attack       0.98      0.75      0.85     78743
+      Benign       0.70      0.97      0.81     46427
+
+    accuracy                           0.83    125170
+   macro avg       0.84      0.86      0.83    125170
+weighted avg       0.88      0.83      0.84    125170
+```
