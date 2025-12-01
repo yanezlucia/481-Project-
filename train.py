@@ -12,10 +12,14 @@ try:
 except Exception as e:
   print(e)
 
+zero_importance_features = ['FIN Flag Count', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Bwd Avg Bulk Rate', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bytes/Bulk', 'Fwd Avg Bulk Rate', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bytes/Bulk', 'PSH Flag Count', 'ECE Flag Count']
+all_low_importance_features = zero_importance_features
+features_to_drop = ['Label', 'Binary_Label'] + zero_importance_features
+
 # Separate X's and Y's
-X_train = train_df.drop(['Label', 'Binary_Label'], axis=1)
+X_train = train_df.drop(features_to_drop, axis=1)
 y_train = train_df['Binary_Label']
-X_test = test_df.drop(['Label', 'Binary_Label'], axis=1)
+X_test = test_df.drop(features_to_drop, axis=1)
 y_test = test_df['Binary_Label']
 
 
@@ -28,25 +32,46 @@ print(f"X_train_scaled shape: {X_train_scaled.shape} \n")
 print(f"X_test_scaled shape: {X_test_scaled.shape} \n")
 
 # Create the Random forest model
-rain_forest_model = RandomForestClassifier(
-    n_estimators=100,
-    class_weight='balanced',
-    random_state=42,
-    n_jobs=1
-)
 
-# Train the model
-print("Training Random Forest...")
-rain_forest_model.fit(X_train, y_train)
-print("Training complete")
+for seed in [42,123, 999]:
+    print(f"\n{'='*60}")
+    print(f"Testing with {seed} ...")
+    rain_forest_model = RandomForestClassifier(
+        n_estimators=200,
+        class_weight='balanced',
+        random_state=seed,
+        n_jobs=1
+    )
+
+    # Train the model
+    print("Training Random Forest...")
+    rain_forest_model.fit(X_train_scaled, y_train)
+    print("Training complete")
+    y_predictions = rain_forest_model.predict(X_test_scaled)
+
+    # Evaluate 
+    print("MODEL PERFORMANCE")
+    print(f"F1 Score: {f1_score(y_test, y_predictions):.4f}")
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_predictions, target_names=['Attack', 'Benign']))
+    print("\nConfusion Matrix:")
+    print(confusion_matrix(y_test, y_predictions))
 
 
-y_predictions = rain_forest_model.predict(X_test_scaled)
+# Get feature importance
+"""
+feature_importance = pd.DataFrame({
+    'feature': X_train.columns,
+    'importance': rain_forest_model.feature_importances_
+}).sort_values('importance', ascending=False)
 
-# Evaluate 
-print("MODEL PERFORMANCE")
-print(f"F1 Score: {f1_score(y_test, y_predictions):.4f}")
-print("\nClassification Report:")
-print(classification_report(y_test, y_predictions, target_names=['Attack', 'Benign']))
-print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, y_predictions))
+print("\nTop 10 Most Important Features:")
+print(feature_importance.head(10))
+
+print("\nBottom 10 Least Important Features:")
+print(feature_importance.tail(10))
+
+new_zero_importance_features = feature_importance[feature_importance['importance'] < 0.001]['feature'].tolist()
+print(f"\nFeatures with importance < 0.001: {len(new_zero_importance_features)}")
+print(new_zero_importance_features)
+"""
