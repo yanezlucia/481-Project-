@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDoS Detection Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-2"> DDoS Detection System</h1>
+            <p class="text-gray-400">Real-time Network Traffic Analysis</p>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="mb-8">
+            <h2 class="text-center text-xl font-semibold mb-4">Simulated Traffic</h2>
+            <div class="flex gap-4 justify-center mb-6">
+                <button onclick="simulateTraffic('benign')" 
+                        class="bg-green-600 hover:bg-green-700 px-8 py-3 rounded-lg font-semibold transition">
+                    Generate Benign Traffic
+                </button>
+                <button onclick="simulateTraffic('attack')" 
+                        class="bg-red-600 hover:bg-red-700 px-8 py-3 rounded-lg font-semibold transition">
+                    Generate Attack Traffic
+                </button>
+            </div>
+            
+            <h2 class="text-center text-xl font-semibold mb-4">Real Test Data</h2>
+            <div class="flex gap-4 justify-center">
+                <button onclick="simulateRealTraffic('benign')" 
+                        class="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-semibold transition border-2 border-green-300">
+                    Test Real Benign Sample
+                </button>
+                <button onclick="simulateRealTraffic('attack')" 
+                        class="bg-red-500 hover:bg-red-600 px-8 py-3 rounded-lg font-semibold transition border-2 border-red-300">
+                    Test Real Attack Sample
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results" class="hidden">
+            <!-- Prediction Box -->
+            <div id="prediction-box" class="rounded-lg p-6 mb-6 text-center">
+                <div class="text-sm text-gray-300 mb-2">Prediction</div>
+                <div id="prediction-text" class="text-3xl font-bold mb-2"></div>
+                <div id="confidence-text" class="text-xl"></div>
+            </div>
+
+            <!-- Features Table -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Traffic Features (Top 10)</h3>
+                <div id="features-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            <p class="mt-4 text-gray-400">Analyzing traffic...</p>
+        </div>
+    </div>
+
+    <script>
+        async function simulateTraffic(type) {
+            // Show loading, hide results
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+
+            try {
+                const response = await fetch(`/simulate/${type}`);
+                const data = await response.json();
+
+                // Hide loading
+                document.getElementById('loading').classList.add('hidden');
+
+                // Show results
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error simulating traffic!');
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            const predictionBox = document.getElementById('prediction-box');
+            const predictionText = document.getElementById('prediction-text');
+            const confidenceText = document.getElementById('confidence-text');
+            const featuresList = document.getElementById('features-list');
+
+            // Style prediction box based on result
+            if (data.prediction === 'Attack') {
+                predictionBox.className = 'rounded-lg p-6 mb-6 text-center bg-red-600';
+                predictionText.textContent = 'ATTACK DETECTED';
+            } else {
+                predictionBox.className = 'rounded-lg p-6 mb-6 text-center bg-green-600';
+                predictionText.textContent = 'BENIGN TRAFFIC';
+            }
+
+            confidenceText.textContent = `Confidence: ${data.confidence}%`;
+
+            // Display features
+            featuresList.innerHTML = '';
+            for (const [feature, value] of Object.entries(data.features)) {
+                const featureDiv = document.createElement('div');
+                featureDiv.className = 'flex justify-between py-2 border-b border-gray-700';
+                featureDiv.innerHTML = `
+                    <span class="text-gray-300">${feature}</span>
+                    <span class="font-mono text-blue-400">${value}</span>
+                `;
+                featuresList.appendChild(featureDiv);
+            }
+
+            // Show results
+            resultsDiv.classList.remove('hidden');
+        }
+        async function simulateRealTraffic(type) {
+    // Show loading, hide results
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('results').classList.add('hidden');
+
+    try {
+        const response = await fetch(`/simulate/real/${type}`);
+        const data = await response.json();
+
+        // Hide loading
+        document.getElementById('loading').classList.add('hidden');
+
+        // Show results with actual label comparison
+        displayRealResults(data);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error testing real traffic!');
+        document.getElementById('loading').classList.add('hidden');
+    }
+}
+
+        function displayRealResults(data) {
+            const resultsDiv = document.getElementById('results');
+            const predictionBox = document.getElementById('prediction-box');
+            const predictionText = document.getElementById('prediction-text');
+            const confidenceText = document.getElementById('confidence-text');
+            const featuresList = document.getElementById('features-list');
+
+            // Style prediction box based on result
+            if (data.prediction === 'Attack') {
+                predictionBox.className = 'rounded-lg p-6 mb-6 text-center bg-red-600';
+                predictionText.textContent = 'ATTACK DETECTED';
+            } else {
+                predictionBox.className = 'rounded-lg p-6 mb-6 text-center bg-green-600';
+                predictionText.textContent = 'BENIGN TRAFFIC';
+            }
+
+            // Show if prediction was correct
+            const correctness = data.correct ? '✓ CORRECT' : '✗ INCORRECT';
+            const correctnessColor = data.correct ? 'text-green-300' : 'text-red-300';
+            
+            confidenceText.innerHTML = `
+                Confidence: ${data.confidence}%<br>
+                <span class="text-sm">Actual Label: ${data.actual}</span><br>
+                <span class="text-sm font-bold ${correctnessColor}">${correctness}</span>
+            `;
+
+            // Display features
+            featuresList.innerHTML = '';
+            for (const [feature, value] of Object.entries(data.features)) {
+                const featureDiv = document.createElement('div');
+                featureDiv.className = 'flex justify-between py-2 border-b border-gray-700';
+                featureDiv.innerHTML = `
+                    <span class="text-gray-300">${feature}</span>
+                    <span class="font-mono text-blue-400">${value}</span>
+                `;
+                featuresList.appendChild(featureDiv);
+            }
+
+            // Show results
+            resultsDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
