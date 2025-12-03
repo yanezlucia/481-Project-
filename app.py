@@ -27,6 +27,20 @@ try:
     print("\n" + "="*60)
     print("Successfully Loaded Model!")
     print("=" * 60)
+
+    print("\n" + "="*60)
+
+    print("Separating benign and attack samples...")
+    benign_samples = train_df[train_df['Binary_Label'] == 1].drop(features_to_drop, axis=1)
+    attack_samples = train_df[train_df['Binary_Label'] == 0].drop(features_to_drop, axis=1)
+
+    benign_stats = benign_samples.describe()
+    attack_stats = attack_samples.describe()
+
+    print(f"Benign samples: {len(benign_samples)}")
+    print(f"Attack samples: {len(attack_samples)}")
+    print("=" * 60)
+
 except Exception as e:
     print(f"Something went wrong: {e}")
     exit(1)
@@ -40,14 +54,24 @@ def simulate_traffic(traffic_type):
     """Generate Simulated traffic and make predictions"""
     if traffic_type == 'benign':
         simulated_features = generate_benign_traffic()
+        print("\n=== BENIGN TRAFFIC GENERATED ===")
     elif traffic_type == 'attack':
         simulated_features = generate_attack_traffic()
+        print("\n=== ATTACK TRAFFIC GENERATED ===")
     else:
         return jsonify({'error': 'Invalid traffic type'}), 400
-
+    
+    print(f"First 5 features: {simulated_features[:5]}")
+    
     features_scaled = scaler.transform([simulated_features])
+    print(f"Scaled features (first 5): {features_scaled[0][:5]}")
+    
     prediction = model.predict(features_scaled)[0]
     prediction_proba = model.predict_proba(features_scaled)[0]
+    
+    print(f"Prediction: {prediction} (0=Attack, 1=Benign)")
+    print(f"Probabilities: Attack={prediction_proba[0]:.2f}, Benign={prediction_proba[1]:.2f}")
+    
     confidence = max(prediction_proba) * 100
 
     result = {
@@ -58,22 +82,23 @@ def simulate_traffic(traffic_type):
     }
     return jsonify(result)
 
-# Helper functions (NO indentation)
 def generate_benign_traffic():
+    """Generate realistic benign traffic """
     features = []
     for col in feature_names:
-        mean = feature_stats[col]['mean']
-        std = feature_stats[col]['std']
-        value = np.random.normal(mean, std * 0.5)
+        mean = benign_stats[col]['mean']
+        std = benign_stats[col]['std']
+        value = np.random.normal(mean, std * 0.3)
         features.append(max(0, value))
     return features
 
 def generate_attack_traffic():
+    """Generate realistic attack traffic """
     features = []
     for col in feature_names:
-        mean = feature_stats[col]['mean']
-        std = feature_stats[col]['std']
-        value = np.random.normal(mean * 1.5, std * 2)
+        mean = attack_stats[col]['mean']
+        std = attack_stats[col]['std']
+        value = np.random.normal(mean, std * 0.5)
         features.append(max(0, value))
     return features
 
