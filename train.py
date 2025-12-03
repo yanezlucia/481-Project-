@@ -16,7 +16,6 @@ except Exception as e:
   print(e)
 
 zero_importance_features = ['FIN Flag Count', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Bwd Avg Bulk Rate', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bytes/Bulk', 'Fwd Avg Bulk Rate', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bytes/Bulk', 'PSH Flag Count', 'ECE Flag Count']
-all_low_importance_features = zero_importance_features
 features_to_drop = ['Label', 'Binary_Label'] + zero_importance_features
 
 # Separate X's and Y's
