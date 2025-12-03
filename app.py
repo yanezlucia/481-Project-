@@ -78,9 +78,6 @@ def simulate_real_traffic(traffic_type):
     # Extract features (drop labels) and convert to array
     sample_features = sample.drop(['Label', 'Binary_Label'] + zero_importance_features).values
 
-    print(f"\n=== REAL {actual_label.upper()} SAMPLE ===")
-    print(f"First 5 features: {sample_features[:5]}")
-
     features_scaled = scaler.transform([sample_features])
 
     # make predictions
