@@ -49,6 +49,63 @@ except Exception as e:
 def home():
     return render_template('index.html')
 
+@app.route("/simulate/real/<traffic_type>")
+def simulate_real_traffic(traffic_type):
+    """
+        Get random samples from dataset
+        1. Load the entire dataset
+        2. Filter based on passed traffic type 
+        3. Pick a random row from the filtered traffic.
+    """
+    test_df_full = pd.read_csv("test_preprocessed.csv")
+
+    if traffic_type == 'benign':
+        benign_samples = test_df_full[test_df_full['Binary_Label'] == 1]
+        if len(benign_samples) == 0:
+            return jsonify({'error': "No benign samples found."}), 400
+        sample = benign_samples.sample(n=1).iloc[0]
+        actual_label = "Benign"
+    
+    elif traffic_type == 'attack':
+        attack_samples = test_df_full[test_df_full['Binary_Label'] == 0]
+        if len(attack_samples) == 0:
+            return jsonify({'error': "No attack samples found."}), 400
+        sample = attack_samples.sample(n=1).iloc[0]
+        actual_label = "Attack"
+    else:
+        return jsonify({'error': 'Invalid traffic type'}), 400
+    
+    # Extract features (drop labels) and convert to array
+    sample_features = sample.drop(['Label', 'Binary_Label'] + zero_importance_features).values
+
+    print(f"\n=== REAL {actual_label.upper()} SAMPLE ===")
+    print(f"First 5 features: {sample_features[:5]}")
+
+    features_scaled = scaler.transform([sample_features])
+
+    # make predictions
+    prediction = model.predict(features_scaled)[0]
+    prediction_proba = model.predict_proba(features_scaled)[0]
+    confidence = max(prediction_proba) * 100
+
+    predicted_label = 'Benign' if prediction == 1 else 'Attack'
+    is_correct = (predicted_label == actual_label)
+    
+    print(f"Actual: {actual_label}, Predicted: {predicted_label}, Correct: {is_correct}")
+    print(f"Confidence: {confidence:.2f}%")
+    
+    result = {
+        'prediction': predicted_label,
+        'confidence': round(confidence, 2),
+        'actual': actual_label,
+        'correct': is_correct,
+        'features': {feature_names[i]: round(float(sample_features[i]), 2) 
+                    for i in range(min(10, len(feature_names)))}
+    }
+    
+    return jsonify(result)
+
+
 @app.route("/simulate/<traffic_type>")
 def simulate_traffic(traffic_type):
     """Generate Simulated traffic and make predictions"""
@@ -77,7 +134,7 @@ def simulate_traffic(traffic_type):
     result = {
         'prediction': 'Benign' if prediction == 1 else 'Attack',
         'confidence': round(confidence, 2),
-        'features': {feature_names[i]: round(simulated_features[i], 2) 
+        'features': {feature_names[i]: round(float(simulated_features[i]), 2) 
                     for i in range(min(10, len(feature_names)))}
     }
     return jsonify(result)
