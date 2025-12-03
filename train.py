@@ -4,6 +4,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pickle
 
 
 try:
@@ -93,16 +94,12 @@ print(f"{'Attack Recall':<25} {rf_report['0']['recall']:<20.4f} {iso_report['0']
 print(f"{'Benign Precision':<25} {rf_report['1']['precision']:<20.4f} {iso_report['1']['precision']:<20.4f}")
 print(f"{'Benign Recall':<25} {rf_report['1']['recall']:<20.4f} {iso_report['1']['recall']:<20.4f}")
 
-feature_importance = pd.DataFrame({
-    'feature': X_train.columns,
-    'importance': rain_forest_model.feature_importances_
-}).sort_values('importance', ascending=False).head(10)
+# Save the model
 
-plt.figure(figsize=(10,6))
-plt.barh(feature_importance['feature'], feature_importance['importance'])
-plt.xlabel('Importance')
-plt.title('Top 10 Most Important Features for DDoS Detection')
-plt.gca().invert_yaxis()
-plt.tight_layout()
-plt.savefig('feature_importance.png', dpi=300, bbox_inches='tight')
-print("Saved: feature_importance.png")
+with open("rf_model.pkl", 'wb') as f:
+  pickle.dump(rain_forest_model, f)
+
+with open('scaler.pkl', 'wb') as f:
+  pickle.dump(scaler,f)
+
+print("Model Saved")

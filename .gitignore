@@ -1,2 +1,4 @@
 test_preprocessed.csv
 train_preprocessed.csv
+rf_model.pkl
+scaler.pkl
