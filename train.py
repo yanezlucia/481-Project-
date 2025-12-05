@@ -41,7 +41,6 @@ rain_forest_model = RandomForestClassifier(
     n_jobs=1
 )
 
-# Train the model    pip install seaborn
 print("Training Random Forest...")
 rain_forest_model.fit(X_train_scaled, y_train)
 print("Training complete")
