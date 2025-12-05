@@ -1,2 +1,13 @@
 train_preprocessed.csv
 test_preprocessed.csv
+iso_confusion_matrix.png
+model_comparison.png
+performance_breakdown.png
+performance_dashboard.png
+performance_table.png
+rf_confusion_matrix.png
+viz.py
+rf_model.pkl
+scaler.pkl
+rf_model.pkl
+scaler.pkl
