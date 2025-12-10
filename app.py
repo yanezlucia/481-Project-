@@ -5,7 +5,6 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load model (keep this in try block)
 try:
     print("Attempting to load model...")
     with open('rf_model.pkl', 'rb') as f:
@@ -22,11 +21,9 @@ try:
     print("\n" + "="*60)
     print("Loading pre-calculated statistics...")
     
-    # Load pre-calculated statistics
     benign_stats = pd.read_json('benign_stats.json')
     attack_stats = pd.read_json('attack_stats.json')
     
-    # Get feature names from the statistics
     feature_names = benign_stats.columns.tolist()
     
     print("Successfully Loaded Model and Statistics!")
@@ -68,12 +65,10 @@ def simulate_real_traffic(traffic_type):
     else:
         return jsonify({'error': 'Invalid traffic type'}), 400
     
-    # Extract features (drop labels) and convert to array
     sample_features = sample.drop(['Label', 'Binary_Label'] + zero_importance_features).values
 
     features_scaled = scaler.transform([sample_features])
 
-    # make predictions
     prediction = model.predict(features_scaled)[0]
     prediction_proba = model.predict_proba(features_scaled)[0]
     confidence = max(prediction_proba) * 100
