@@ -11,3 +11,7 @@ rf_model.pkl
 scaler.pkl
 rf_model.pkl
 scaler.pkl
+test_preprocessed.csv
+train_preprocessed.csv
+rf_model.pkl
+scaler.pkl

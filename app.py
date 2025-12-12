@@ -5,6 +5,7 @@ import pandas as pd
 
 app = Flask(__name__)
 
+# Load model (keep this in try block)
 try:
     print("Attempting to load model...")
     with open('rf_model.pkl', 'rb') as f:
@@ -13,24 +14,33 @@ try:
     with open('scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
 
+    train_df = pd.read_csv("train_preprocessed.csv")
     zero_importance_features = ['FIN Flag Count', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 
                                 'Bwd Avg Bulk Rate', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bytes/Bulk', 
                                 'Fwd Avg Bulk Rate', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bytes/Bulk', 
                                 'PSH Flag Count', 'ECE Flag Count']
+    features_to_drop = ['Label', 'Binary_Label'] + zero_importance_features
+    X_train = train_df.drop(features_to_drop, axis=1)
+    feature_names = X_train.columns.tolist()
+    feature_stats = X_train.describe()
     
     print("\n" + "="*60)
-    print("Loading pre-calculated statistics...")
-    
-    benign_stats = pd.read_json('benign_stats.json')
-    attack_stats = pd.read_json('attack_stats.json')
-    
-    feature_names = benign_stats.columns.tolist()
-    
-    print("Successfully Loaded Model and Statistics!")
-    print(f"Number of features: {len(feature_names)}")
+    print("Successfully Loaded Model!")
     print("=" * 60)
 
-    
+    print("\n" + "="*60)
+
+    print("Separating benign and attack samples...")
+    benign_samples = train_df[train_df['Binary_Label'] == 1].drop(features_to_drop, axis=1)
+    attack_samples = train_df[train_df['Binary_Label'] == 0].drop(features_to_drop, axis=1)
+
+    benign_stats = benign_samples.describe()
+    attack_stats = attack_samples.describe()
+
+    print(f"Benign samples: {len(benign_samples)}")
+    print(f"Attack samples: {len(attack_samples)}")
+    print("=" * 60)
+
 except Exception as e:
     print(f"Something went wrong: {e}")
     exit(1)
