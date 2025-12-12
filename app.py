@@ -14,7 +14,7 @@ try:
     with open('scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
 
-    train_df = pd.read_csv("train_preprocessed.csv")
+    train_df = pd.read_csv("test_preprocessed.csv")
     zero_importance_features = ['FIN Flag Count', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 
                                 'Bwd Avg Bulk Rate', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bytes/Bulk', 
                                 'Fwd Avg Bulk Rate', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bytes/Bulk', 
