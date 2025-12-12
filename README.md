@@ -3,7 +3,7 @@ An intelligent DDoS attack detection system using machine learning to classify n
 
 The project is available here: https://ai-ddos-detector.onrender.com
 
-Otherwise you can follow the steps below to get the model working, but that requires the model to be trained. 
+Otherwise you can follow the steps below to get the model running locally.
 
 ### Create venv
 `python venv -m .venv`
@@ -17,13 +17,8 @@ Otherwise you can follow the steps below to get the model working, but that requ
 
 ### Workflow
 ```
-# 1. Preprocess the data
-python preprocess.py
 
-# 2. Train the model
-python train.py
-
-# 3. Launch the Flask application
+# 1. Launch the Flask application to see the model in action
 python app.py
 ```
 
