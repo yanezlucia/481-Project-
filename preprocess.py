@@ -8,8 +8,8 @@ try:
     dataset = load_dataset("HallowsYves/CPSC481-data")
 
     print("Converting to Dataframes... \n")
-    df_train = dataset['test'].to_pandas()
-    df_test = dataset['train'].to_pandas()
+    df_train = dataset['train'].to_pandas()
+    df_test = dataset['test'].to_pandas()
 
     # Create new Binary label columns for train and test
     df_train['Binary_Label'] = 0

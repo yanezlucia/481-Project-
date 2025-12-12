@@ -1,31 +1,32 @@
-# 481-Project-
-DDOS detector with AI integration 
+# AI-DDoS Detector
+An intelligent DDoS attack detection system using machine learning to classify network traffic as benign or malicious. This project implements a Random Forest classifier with feature selection optimization and includes a Flask-based web interface for real-time predictions.
 
-### Load virtual environment 
+The project is available here: https://ai-ddos-detector.onrender.com
+
+Otherwise you can follow the steps below to get the model working, but that requires the model to be trained. 
+
+### Create venv
+`python venv -m .venv`
+
+### Activate Venv
 `venv/scripts/activate` | <= Windows
-
-
 `source venv/bin/activate` | <= Mac
 
 ### Install Req's
 `pip install -r requirements.txt`
 
-## What was done
-* Separated X features from target feature y. 
-* Scaled Features
-* Created random_forest model. 
-
-## MODEL PERFORMANCE
+### Workflow
 ```
-F1 Score: 0.8131
+# 1. Preprocess the data
+python preprocess.py
 
-Classification Report:
-              precision    recall  f1-score   support
+# 2. Train the model
+python train.py
 
-      Attack       0.98      0.75      0.85     78743
-      Benign       0.70      0.97      0.81     46427
-
-    accuracy                           0.83    125170
-   macro avg       0.84      0.86      0.83    125170
-weighted avg       0.88      0.83      0.84    125170
+# 3. Launch the Flask application
+python app.py
 ```
+
+
+## Datasets
+Can be found here: https://huggingface.co/datasets/HallowsYves/CPSC481-data

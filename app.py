@@ -57,7 +57,7 @@ def simulate_real_traffic(traffic_type):
         2. Filter based on passed traffic type 
         3. Pick a random row from the filtered traffic.
     """
-    test_df_full = pd.read_csv("test_preprocessed.csv")
+    test_df_full = pd.read_csv("sampled_test_data.csv")
 
     if traffic_type == 'benign':
         benign_samples = test_df_full[test_df_full['Binary_Label'] == 1]
@@ -75,12 +75,10 @@ def simulate_real_traffic(traffic_type):
     else:
         return jsonify({'error': 'Invalid traffic type'}), 400
     
-    # Extract features (drop labels) and convert to array
     sample_features = sample.drop(['Label', 'Binary_Label'] + zero_importance_features).values
 
     features_scaled = scaler.transform([sample_features])
 
-    # make predictions
     prediction = model.predict(features_scaled)[0]
     prediction_proba = model.predict_proba(features_scaled)[0]
     confidence = max(prediction_proba) * 100
